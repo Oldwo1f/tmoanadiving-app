@@ -1,67 +1,145 @@
 <template>
-  <div>
-    <h1>Home Playstar</h1>
-    <p>Todo : Creer une page d'accueil pour la marque play star. qui explique le concepte au client.</p>
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Aut voluptas quia, dicta deserunt recusandae magni aliquam. Perferendis dolorem error explicabo id nulla voluptatum, culpa sed, debitis in unde, exercitationem molestias?</p>
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Aut voluptas quia, dicta deserunt recusandae magni aliquam. Perferendis dolorem error explicabo id nulla voluptatum, culpa sed, debitis in unde, exercitationem molestias?</p>
-  
-    <h2>Nos jeux du moment</h2>
+  <div class="contentInside">
+    
+		
+		<div class="blocksHome">
+			<BlockHome1 :date="$dayjs( $calculateDateExpi($auth.user,$dayjs)).format('DD MMMM YYYY')" :credit="$calculateCredit($auth.user,$dayjs)"/>
+			<nuxt-link to="/qrcode">
+				<BlockHome2 qrcode=""/>
+			</nuxt-link>
+			<div class="blocksline">
+				<nuxt-link class="blockhome3" to="/map">
+					<div class="picto"></div>
+					<div class="text">Trouver un centre</div>
+					
+				</nuxt-link>
+				<nuxt-link class="blockhome4" to="/profil">
+					<div class="picto"></div>
+					<div class="text">Mon compte</div>
+					
+				</nuxt-link>
+			</div>	
+		
 
-    <div class="gamelist">
-      <div class="game" v-for="jeu in items" :key="jeu.id">
-        <nuxt-link :to="'/jeux/'+jeu.url">
-          <h4>{{jeu.name}}</h4>
-          <img v-if="jeu.images[0]" :src="$config.apiURL + 'image/'+ jeu.images[0].filename" alt="">
-        </nuxt-link>
-        <!-- <div class="description" v-html="jeu.description">
-        </div> -->
-        <!-- <div class="images">
-          <div class="image" v-for="image in jeu.images" :key="image.id">
-            <img :src="$config.apiURL +'image/'+ image.filename" alt="">
-          </div>
-        </div> -->
-      </div>
-    </div>
+		</div>
+
+		<CarouselClub :items="state.partenaires.partenaires"/>
+
+		<!-- <div class="carouselClub">
+				<div class="text">Plus de 14 club de plongées en Polynésie française</div>
+				<div class="slider">
+					<div class="logoclient"></div>
+					<div class="logoclient"></div>
+					<div class="logoclient"></div>
+				</div>
+		</div> -->
+		<a href="https://www.temoanadiving.com/" target="_BLANK" class="lepass">
+			<div class="text">Le Temoana Pass</div>
+			<div class="picto"></div>
+		</a>
   </div>
 </template>
 
 <script setup>
+
   const { $store } = useNuxtApp()
   const { state } = $store
-  // console.log('$auth=',$auth.loggedIn);
-  // console.log('$auth=',$auth.user);
 
 
-  $store.dispatch('jeux/fetchJeux')
+$store.dispatch('partenaires/fetchPartenaires')
 
-  const items= computed({
-		set: (val) => {},
-		get:() =>  state.jeux.jeux,
-	})
-  // const state = ref($store.state)
-  // console.log('$store.state.menuCollapsed init=',$store.state.menuCollapsed);
-  // const getMenuCollapsed = ()=>{
-  //   console.log('$store.menuCollapsed',$store.state.menuCollapsed);
-  //   return $store.state.menuCollapsed
-  // }
+//   const items= computed({
+// 		set: (val) => {},
+// 		get:() =>  state.jeux.jeux,
+// 	})
+
  
 </script>
 
 <style scoped lang="less">
-.toto{
-  position:fixed;
-  bottom : 50px;
-  right:50px;
+@import '~static/less/variable.less';
+.contentInside{
+      top: 0;
+      bottom: 0;
+      
+        padding:40px 0px 70px 0px;
+            background: url('assets/images/bg1.png') no-repeat;
+            background-size: cover;
+}
+.blocksHome {
+	
+	margin-top: 40px;
+	margin-bottom: 40px;
 }
 
-.game{
-  h4{
-    color:black;
-    text-align: center;
-  }
-  img{
-    max-width:100%;
-    margin-bottom: 20px;
-  }
+
+.blocksline {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-direction: row;
+	width:80%;
+	margin-left: 10%;
 }
+
+
+.blockhome3 {
+	width: 48%;
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+	flex-direction: column;
+	background: white;
+	border-radius: 20px;
+	margin-top: 20px;
+	padding: 20px 10px;
+
+}
+
+.blockhome3 .text {
+	font-size: 1.2em;
+	font-weight: bold;
+	text-align: center;
+	line-height: 22px;
+	color: #004D61;
+}
+
+.blockhome3 .picto {
+	width: 40px;
+	height: 40px;
+	background: url('assets/images/plonge bleu.png') no-repeat;
+	background-size: contain;
+	margin-bottom: 10px;
+}
+
+.blockhome4 {
+	width: 48%;
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+	flex-direction: column;
+	background: white;
+	border-radius: 20px;
+	margin-top: 20px;
+	padding: 20px 10px;
+
+}
+
+.blockhome4 .text {
+	font-size: 1.2em;
+	font-weight: bold;
+	text-align: center;
+	line-height: 22px;
+	color: #004D61;
+}
+
+.blockhome4 .picto {
+	width: 40px;
+	height: 40px;
+	background: url('assets/images/user.png') no-repeat;
+	background-size: contain;
+	margin-bottom: 10px;
+}
+
+
 </style>

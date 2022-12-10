@@ -10,10 +10,10 @@ export default defineNuxtConfig({
     nitro: false,
     meta: true
   },
-  target: 'server',
+  target: 'static',
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'MADMIN',
+    title: 'Te Moana Diving',
     htmlAttrs: {
       lang: 'fr'
     },
@@ -24,10 +24,10 @@ export default defineNuxtConfig({
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Roboto:wght@100;400;700;900&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,700;1,400&display=swap",
       },
     ]
   },
@@ -49,8 +49,16 @@ export default defineNuxtConfig({
     // { src: '~/plugins/vue-masonry', ssr: false },
     // '~plugins/scrollbar.js',
     // '~plugins/jsontocsv.js',
-    // '~plugins/croppa.js',
-    { src: '~/plugins/veevalidate.js', ssr: true },
+    '~plugins/touchevents.js',
+
+    '~plugins/formatnumber.js',
+    '~plugins/calculateCredit.js',
+    '~plugins/calculateDateExpi.js',
+    '~/plugins/map',
+    { src: '~/plugins/veevalidate.js', ssr: false },
+    { src: '~/plugins/vuecarousel.js', ssr: false },
+    // { src: '~/plugins/flipcountdown.js', ssr: true },
+    // { src: '~/plugins/vue-awesome-countdown.js', ssr: false },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -66,8 +74,14 @@ export default defineNuxtConfig({
     'nuxt-material-design-icons-iconfont',
     'bootstrap-vue/nuxt',
     '@nuxtjs/axios',
-    // '@nuxtjs/auth-next',
+    '@nuxtjs/auth-next',
     '@nuxtjs/dayjs',
+    'vue-social-sharing/nuxt',
+    'vue-geolocation-api/nuxt',
+    ['nuxt-gmaps', {
+      key: 'AIzaSyB0VFbqHYEgybmfivHvTnb5ojZnV8ITZi0'
+      // you can use libraries: ['places']
+    }]
   ],
 
   dayjs: {
@@ -79,51 +93,52 @@ export default defineNuxtConfig({
       'timezone' // import 'dayjs/plugin/timezone'
     ] // Your Day.js plugin
   },
-  router: {
-    // middleware: 'auth'
+  auth: {
+
+    redirect: {
+      login: '/login',
+      logout: '/',
+      callback: '/login',
+      home: '/'
+    },
+    strategies: {
+      local: {
+
+        token: {
+          property: 'token',
+          global: true,
+          required: true,
+          type: 'Bearer'
+        },
+        user: {
+          property: 'user',
+          autoFetch: true
+        },
+        endpoints: {
+          login: { url: '/auth/login', method: 'post', propertyName: 'token' },
+          logout: false,
+          user: { url: '/auth/user', method: 'get' }
+        }
+      },
+      // facebook: {
+      //   endpoints: {
+      //     userInfo: 'https://graph.facebook.com/v6.0/me?fields=id,name,picture{url}'
+      //   },
+      //   clientId: '460503435426912',
+      //   scope: ['public_profile', 'email']
+      // },
+    }
   },
-  // auth: {
 
-  //   redirect: {
-  //     login: '/login',
-  //     logout: '/',
-  //     callback: '/login',
-  //     home: '/'
-  //   },
-  //   strategies: {
-  //     local: {
-
-  //       token: {
-  //         property: 'token',
-  //         global: true,
-  //         required: true,
-  //         type: 'Bearer'
-  //       },
-  //       user: {
-  //         property: 'user',
-  //         autoFetch: true
-  //       },
-  //       endpoints: {
-  //         login: { url: '/auth/loginadmin', method: 'post', propertyName: 'token' },
-  //         logout: false,
-  //         user: { url: '/auth/user', method: 'get' }
-  //       }
-  //     },
-  //     facebook: {
-  //       endpoints: {
-  //         userInfo: 'https://graph.facebook.com/v6.0/me?fields=id,name,picture{url}'
-  //       },
-  //       clientId: '460503435426912',
-  //       scope: ['public_profile', 'email']
-  //     },
-  //   }
-  // },
+  router: {
+    middleware: 'auth'
+  },
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     mode: 'no-cors',
     proxyHeaders: false,
     credentials: false,
-    baseURL: 'http://localhost:1337/api/v1/',
+    baseURL: process.env.API_URL,
 
     // headers: {
     //   common: {
@@ -140,6 +155,15 @@ export default defineNuxtConfig({
         _: 'lodash'
       })
     ],
-    transpile: ['vee-validate']
+    transpile: ['vee-validate'],
+    extend(config, ctx) {
+      if (ctx.isServer) {
+        config.externals = [
+          nodeExternals({
+            whitelist: [/^vue-carousel/]
+          })
+        ]
+      }
+    }
   }
 })
